@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: sangeet-container
+    image: sangeet-dev
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    ports:
+      - '${EXPOSE_PORT}:${APP_PORT}'
+    depends_on:
+      - sangeet-postgres
+    command: yarn start:dev
+
+  sangeet-postgres:
+    container_name: sangeet-database
+    image: postgres:15-alpine
+    ports:
+      - $POSTGRES_PORT:5432
+    env_file:
+      - .env
+    volumes:
+      - sangeet-db-data:$PG_DOCKER_VOLUME
+
+volumes:
+  sangeet-db-data:
