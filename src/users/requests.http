@@ -1,0 +1,24 @@
+### Create a new user
+POST http://localhost:1337/users/signup
+Content-Type: application/json
+
+{
+  "email": "duper@pm.me",
+  "username": "super123",
+  "password": "password123"
+}
+
+### Signin
+POST http://localhost:1337/users/signin
+Content-Type: application/json
+
+{
+  "email": "super@pm.me",
+  "password": "password123"
+}
+
+### Who am I
+GET http://localhost:1337/users/whoami
+
+### Signout
+POST http://localhost:1337/users/signout
