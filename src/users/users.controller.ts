@@ -3,9 +3,12 @@ import { Body, Controller, Get, Post, Session } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UserDto } from './dtos/user.dto';
 import { SigninDto } from './dtos/signin.dto';
+import { Serialize } from '../interceptor/serialize.interceptor';
 
 @Controller('users')
+@Serialize(UserDto)
 export class UsersController {
   constructor(
     private authService: AuthService,
