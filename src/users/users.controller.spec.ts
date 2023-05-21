@@ -57,4 +57,20 @@ describe('UsersController', () => {
       expect(session.userId).toEqual(TEST_ID);
     });
   });
+
+  describe('signout', () => {
+    it('clears session', async () => {
+      const session = { userId: null };
+      await controller.signin(
+        {
+          email: TEST_EMAIL,
+          password: TEST_PASSWORD,
+        },
+        session,
+      );
+
+      await controller.signout(session);
+      expect(session.userId).toBe(null);
+    });
+  });
 });
