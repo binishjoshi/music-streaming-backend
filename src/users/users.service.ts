@@ -33,4 +33,9 @@ export class UsersService {
 
     return this.repo.save(user);
   }
+
+  changePreference(user: User) {
+    user.preference = user.preference === 'flac' ? 'opus' : 'flac';
+    this.repo.save(user);
+  }
 }

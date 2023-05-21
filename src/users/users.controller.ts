@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Session,
   UseGuards,
@@ -52,5 +53,11 @@ export class UsersController {
   @Post('signout')
   signout(@Session() session: any) {
     session.userId = null;
+  }
+
+  @Patch('/change-preference')
+  @UseGuards(AuthGuard)
+  changePrefernce(@CurrentUser() user: User) {
+    this.usersService.changePreference(user);
   }
 }

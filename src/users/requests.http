@@ -22,3 +22,6 @@ GET http://localhost:1337/users/whoami
 
 ### Signout
 POST http://localhost:1337/users/signout
+
+### Change user preference
+PATCH http://localhost:1337/users/change-preference
