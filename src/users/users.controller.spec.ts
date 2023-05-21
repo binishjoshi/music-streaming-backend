@@ -11,6 +11,7 @@ describe('UsersController', () => {
   let fakeAuthService: Partial<AuthService>;
 
   const TEST_EMAIL = 'test@pm.me';
+  const TEST_USERNAME = 'test123';
   const TEST_PASSWORD = 'test123456';
   const TEST_ID = 'test-1235';
 
@@ -18,6 +19,14 @@ describe('UsersController', () => {
     fakeAuthService = {
       signin: (email: string, password: string) => {
         return Promise.resolve({ id: TEST_ID, email, password } as User);
+      },
+      signup: (email: string, username: string, password: string) => {
+        return Promise.resolve({
+          id: TEST_ID,
+          email,
+          username,
+          password,
+        } as User);
       },
     };
 
@@ -48,6 +57,23 @@ describe('UsersController', () => {
       const user = await controller.signin(
         {
           email: TEST_EMAIL,
+          password: TEST_PASSWORD,
+        },
+        session,
+      );
+
+      expect(user.id).toEqual(TEST_ID);
+      expect(session.userId).toEqual(TEST_ID);
+    });
+  });
+
+  describe('sign up', () => {
+    it('updates session object and returns user', async () => {
+      const session = { userId: -69 };
+      const user = await controller.createUser(
+        {
+          email: TEST_EMAIL,
+          username: TEST_USERNAME,
           password: TEST_PASSWORD,
         },
         session,
