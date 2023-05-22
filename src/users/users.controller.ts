@@ -63,6 +63,13 @@ export class UsersController {
     session.userId = null;
   }
 
+  @Post('deactivate')
+  @UseGuards(AuthGuard)
+  deactivate(@CurrentUser() user: User, @Session() session: any) {
+    session.userId = null;
+    this.usersService.delete(user);
+  }
+
   @Patch('/change-preference')
   @UseGuards(AuthGuard)
   changePrefernce(@CurrentUser() user: User) {
