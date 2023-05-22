@@ -1,8 +1,11 @@
+import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from './user.entity';
+import { FileType } from './types/file.type';
+import { writeFileSync } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -36,6 +39,19 @@ export class UsersService {
 
   changePreference(user: User) {
     user.preference = user.preference === 'flac' ? 'opus' : 'flac';
+    this.repo.save(user);
+  }
+
+  savePicture(file: FileType, user: User) {
+    const md5Hash = createHash('md5');
+    md5Hash.update(file.buffer);
+    const hashText = md5Hash.digest('hex');
+
+    const fileName = `${hashText}.${file.ext}`;
+    const filePath = 'uploads/images/' + fileName;
+    writeFileSync(filePath, file.buffer);
+
+    user.profilePicture = filePath;
     this.repo.save(user);
   }
 }

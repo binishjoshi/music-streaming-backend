@@ -4,6 +4,9 @@
 # packages
 /node_modules
 
+# fs
+/uploads
+
 # Logs
 logs
 *.log

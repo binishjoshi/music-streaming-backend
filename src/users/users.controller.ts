@@ -2,11 +2,16 @@ import {
   Body,
   Controller,
   Get,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Patch,
   Post,
   Session,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
@@ -17,6 +22,9 @@ import { Serialize } from '../interceptor/serialize.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../guards/auth.guard';
+import { ImageValidationPipe } from './pipes/image-validation.pipe';
+import { FileType } from './types/file.type';
+import { ImageDownscalePipe } from './pipes/image-downscale.pipe';
 
 @Controller('users')
 @Serialize(UserDto)
@@ -59,5 +67,22 @@ export class UsersController {
   @UseGuards(AuthGuard)
   changePrefernce(@CurrentUser() user: User) {
     this.usersService.changePreference(user);
+  }
+
+  @Post('/change-profile')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('picture'))
+  changeProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 8 * 1024 * 1024 })],
+      }),
+      new ImageValidationPipe(),
+      new ImageDownscalePipe(),
+    )
+    file: FileType,
+    @CurrentUser() user: User,
+  ) {
+    this.usersService.savePicture(file, user);
   }
 }
