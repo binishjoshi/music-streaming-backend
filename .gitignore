@@ -20,7 +20,7 @@ lerna-debug.log*
 .DS_Store
 
 # Env
-*.env
+*.env*
 
 # Tests
 /coverage

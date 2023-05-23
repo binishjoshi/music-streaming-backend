@@ -12,7 +12,7 @@ services:
       - .:/app
       - /app/node_modules
     env_file:
-      - .env
+      - .env.development
     ports:
       - '${EXPOSE_PORT}:${APP_PORT}'
     depends_on:
@@ -25,7 +25,7 @@ services:
     ports:
       - $POSTGRES_PORT:5432
     env_file:
-      - .env
+      - .env.development
     volumes:
       - sangeet-db-data:$PG_DOCKER_VOLUME
 
