@@ -65,7 +65,12 @@ export class UsersController {
 
   @Post('deactivate')
   @UseGuards(AuthGuard)
-  deactivate(@CurrentUser() user: User, @Session() session: any) {
+  async deactivate(
+    @CurrentUser() user: User,
+    @Session() session: any,
+    @Body() body: SigninDto,
+  ) {
+    await this.authService.signin(body.email, body.password);
     session.userId = null;
     this.usersService.delete(user);
   }

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { DataSource } from 'typeorm';
+
+import { AppModule } from './../src/app.module';
 import { User } from '../src/users/user.entity';
 
 describe('Auth (e2e)', () => {
@@ -110,5 +111,18 @@ describe('Auth (e2e)', () => {
       .expect(404);
   });
 
-  // it('deactivates user', async () => {});
+  it('deactivates user', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/users/deactivate')
+      .set('Cookie', cookie)
+      .send({ email: EMAIL, password: PASSWORD })
+      .expect(201);
+  });
 });
