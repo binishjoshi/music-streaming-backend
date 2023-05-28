@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  test-app:
+    container_name: test-sangeet-container
+    image: test-sangeet-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.test
+    depends_on:
+      - test-sangeet-postgres
+    command: yarn start:dev
+
+  test-sangeet-postgres:
+    container_name: test-sangeet-database
+    image: postgres:15-alpine
+    env_file:
+      - .env.test
