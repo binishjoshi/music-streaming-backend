@@ -2,7 +2,7 @@ import { Body, Controller, Post, Session } from '@nestjs/common';
 
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
-import { SigninDto } from 'src/users/dtos/signin.dto';
+import { SigninDto } from '../users/dtos/signin.dto';
 
 @Controller('artist-managers')
 export class ArtistManagersController {
@@ -26,7 +26,7 @@ export class ArtistManagersController {
   async signin(@Body() body: SigninDto, @Session() session: any) {
     const user = await this.authService.signin(
       { email: body.email, password: body.password },
-      'user',
+      'artistManager',
     );
     session.userId = user.id;
     return user;

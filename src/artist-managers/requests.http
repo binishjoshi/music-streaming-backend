@@ -1,5 +1,5 @@
 ### Create a new user
-POST http://localhost:1337/users/signup
+POST http://localhost:1337/artist-managers/signup
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Signin
-POST http://localhost:1337/users/signin
+POST http://localhost:1337/artist-managers/signin
 Content-Type: application/json
 
 {
@@ -18,4 +18,4 @@ Content-Type: application/json
 }
 
 ### Signout
-POST http://localhost:1337/users/signout
+POST http://localhost:1337/artist-managers/signout

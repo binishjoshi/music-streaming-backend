@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ArtistManagersModule } from './artist-managers/artist-managers.module';
+import { ArtistManger } from './artist-managers/artist-manager.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { ArtistManagersModule } from './artist-managers/artist-managers.module';
           password: config.get<string>('POSTGRES_PASSWORD'),
           database: config.get<string>('POSTGRES_DB'),
           synchronize: true,
-          entities: [User],
+          entities: [User, ArtistManger],
         };
       },
     }),
