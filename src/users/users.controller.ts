@@ -43,9 +43,8 @@ export class UsersController {
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signup(
-      body.email,
-      body.username,
-      body.password,
+      { email: body.email, username: body.username, password: body.password },
+      'user',
     );
     session.userId = user.id;
     return user;
@@ -53,7 +52,10 @@ export class UsersController {
 
   @Post('/signin')
   async signin(@Body() body: SigninDto, @Session() session: any) {
-    const user = await this.authService.signin(body.email, body.password);
+    const user = await this.authService.signin(
+      { email: body.email, password: body.password },
+      'user',
+    );
     session.userId = user.id;
     return user;
   }
@@ -70,7 +72,10 @@ export class UsersController {
     @Session() session: any,
     @Body() body: SigninDto,
   ) {
-    await this.authService.signin(body.email, body.password);
+    await this.authService.signin(
+      { email: body.email, password: body.password },
+      'user',
+    );
     session.userId = null;
     this.usersService.delete(user);
   }
