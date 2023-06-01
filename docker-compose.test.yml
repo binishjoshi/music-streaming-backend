@@ -12,6 +12,8 @@ services:
       - /app/node_modules
     env_file:
       - .env.test
+    ports:
+      - '${EXPOSE_PORT}:${APP_PORT}'
     depends_on:
       - test-sangeet-postgres
     command: yarn start:dev
@@ -19,5 +21,7 @@ services:
   test-sangeet-postgres:
     container_name: test-sangeet-database
     image: postgres:15-alpine
+    ports:
+      - $POSTGRES_PORT:5432
     env_file:
       - .env.test
