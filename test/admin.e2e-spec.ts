@@ -112,6 +112,26 @@ describe('Auth (e2e)', () => {
       .expect(404);
   });
 
+  it('signs in and fetches artist manager requests', async () => {
+    await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+
+    const res = await request(app.getHttpServer())
+      .post(SIGNIN_ROUTE)
+      .send({ email: EMAIL, password: PASSWORD })
+      .expect(201);
+
+    const cookie = res.get('Set-Cookie');
+    const { body } = await request(app.getHttpServer())
+      .get('/artist-managers/requests')
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(body.length).toBeGreaterThanOrEqual(0);
+  });
+
   // it('deactivates user', async () => {
   //   const res = await request(app.getHttpServer())
   //     .post(SIGNUP_ROUTE)

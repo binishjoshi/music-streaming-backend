@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { ArtistManger } from '../artist-managers/artist-manager.entity';
 import { User } from '../users/user.entity';
+import { ArtistManagerRequest } from '../artist-managers/artist-manager-request.entity';
 
 @Entity()
 export class Admin {
@@ -25,4 +26,10 @@ export class Admin {
 
   @OneToMany(() => User, (user) => user.id)
   usersDisabled: User[];
+
+  @OneToMany(
+    () => ArtistManagerRequest,
+    (artistManagerRequest) => artistManagerRequest.id,
+  )
+  requestsVerfied: ArtistManagerRequest[];
 }

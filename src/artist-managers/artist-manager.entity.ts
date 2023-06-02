@@ -19,7 +19,7 @@ export class ArtistManger {
   @Column('text', { array: true, default: [] })
   artists: string[];
 
-  @Column()
+  @Column({ default: false })
   verified: boolean;
 
   @ManyToOne(() => Admin, (admin) => admin.artistManagersVerified)

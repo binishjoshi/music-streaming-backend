@@ -8,14 +8,16 @@ import { AuthService } from '../auth/auth.service';
 import { UsersModule } from '../users/users.module';
 import { CurrentArtistManagerMiddleware } from './middlewares/current-artist-manager.middleware';
 import { AdminsModule } from '../admins/admins.module';
+import { ArtistManagerRequest } from './artist-manager-request.entity';
+import { ArtistManagerRequestsService } from './artist-manager-requests.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ArtistManger]),
+    TypeOrmModule.forFeature([ArtistManger, ArtistManagerRequest]),
     forwardRef(() => UsersModule),
     forwardRef(() => AdminsModule),
   ],
-  providers: [ArtistManagersService, AuthService],
+  providers: [ArtistManagersService, AuthService, ArtistManagerRequestsService],
   controllers: [ArtistManagersController],
   exports: [ArtistManagersService],
 })

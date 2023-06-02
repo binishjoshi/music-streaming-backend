@@ -22,3 +22,14 @@ POST http://localhost:1337/artist-managers/signout
 
 ### Who am I
 GET http://localhost:1337/artist-managers/whoami
+
+### Get requests (has to be admin)
+GET http://localhost:1337/artist-managers/requests
+
+### Request for verification
+GET http://localhost:1337/artist-managers/request-for-verification
+Content-Type: application/json
+
+{
+  "letter": "Please acccept me"
+}
