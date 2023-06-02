@@ -15,6 +15,7 @@ describe('Auth (e2e)', () => {
   const SIGNUP_ROUTE = '/artist-managers/signup';
   const SIGNIN_ROUTE = '/artist-managers/signin';
   const SIGNOUT_ROUTE = '/artist-managers/signout';
+  const WHOAMI_ROUTE = '/artist-managers/whoami';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -53,24 +54,24 @@ describe('Auth (e2e)', () => {
       });
   });
 
-  // it('signs up as a new user and gets the current logged in user', async () => {
-  //   const res = await request(app.getHttpServer())
-  //     .post(SIGNUP_ROUTE)
-  //     .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
-  //     .expect(201);
+  it('signs up as a new user and gets the current logged in user', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
 
-  //   const cookie = res.get('Set-Cookie');
+    const cookie = res.get('Set-Cookie');
 
-  //   const { body } = await request(app.getHttpServer())
-  //     .get('/users/whoami')
-  //     .set('Cookie', cookie)
-  //     .expect(200);
+    const { body } = await request(app.getHttpServer())
+      .get(WHOAMI_ROUTE)
+      .set('Cookie', cookie)
+      .expect(200);
 
-  //   expect(body.email).toEqual(EMAIL);
-  // });
+    expect(body.email).toEqual(EMAIL);
+  });
 
   it('signs in', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post(SIGNUP_ROUTE)
       .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
       .expect(201);
@@ -80,13 +81,13 @@ describe('Auth (e2e)', () => {
       .send({ email: EMAIL, password: PASSWORD })
       .expect(201);
 
-    // const cookie = res.get('Set-Cookie');
-    // const { body } = await request(app.getHttpServer())
-    //   .get('/users/whoami')
-    //   .set('Cookie', cookie)
-    //   .expect(200);
+    const cookie = res.get('Set-Cookie');
+    const { body } = await request(app.getHttpServer())
+      .get(WHOAMI_ROUTE)
+      .set('Cookie', cookie)
+      .expect(200);
 
-    // expect(body.email).toEqual(EMAIL);
+    expect(body.email).toEqual(EMAIL);
   });
 
   it('signs out', async () => {
