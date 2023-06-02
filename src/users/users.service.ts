@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from './user.entity';
-import { FileType } from './types/file.type';
+import { FileType } from '../types/file.type';
 import { writeFileSync } from 'fs';
 
 @Injectable()

@@ -23,9 +23,9 @@ import { Serialize } from '../interceptor/serialize.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../guards/auth.guard';
-import { ImageValidationPipe } from './pipes/image-validation.pipe';
-import { FileType } from './types/file.type';
-import { ImageDownscalePipe } from './pipes/image-downscale.pipe';
+import { ImageValidationPipe } from '../pipes/image-validation.pipe';
+import { FileType } from '../types/file.type';
+import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 
 @Controller('users')
 @Serialize(UserDto)
