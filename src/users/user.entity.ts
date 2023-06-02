@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Admin } from '../admins/admin.entity';
 
 @Entity()
 export class User {
@@ -31,4 +32,10 @@ export class User {
 
   @Column('text', { array: true, default: [] })
   followedPlaylists: string[];
+
+  @Column({ default: false })
+  isDisabled: boolean;
+
+  @ManyToOne(() => Admin, (admin) => admin.usersDisabled)
+  disabledBy: Admin;
 }

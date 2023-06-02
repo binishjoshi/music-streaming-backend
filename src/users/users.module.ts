@@ -7,11 +7,13 @@ import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 import { ArtistManagersModule } from '../artist-managers/artist-managers.module';
+import { AdminsModule } from '../admins/admins.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => ArtistManagersModule),
+    forwardRef(() => AdminsModule),
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService],

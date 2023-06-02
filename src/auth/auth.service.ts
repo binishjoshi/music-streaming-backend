@@ -7,8 +7,9 @@ import * as argon2 from 'argon2';
 
 import { UsersService } from '../users/users.service';
 import { ArtistManagersService } from '../artist-managers/artist-managers.service';
+import { AdminsService } from '../admins/admins.service';
 
-type EntityType = 'user' | 'artistManager';
+type EntityType = 'user' | 'artistManager' | 'admin';
 
 interface SigninPayloadType {
   email: string;
@@ -26,6 +27,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private artistManagersService: ArtistManagersService,
+    private adminsService: AdminsService,
   ) {}
   async signup(
     { email, username, password }: SignupPayloadType,
@@ -35,8 +37,10 @@ export class AuthService {
 
     if (entity === 'user') {
       users = await this.usersService.findUserByEmail(email);
-    } else {
+    } else if (entity === 'artistManager') {
       users = await this.artistManagersService.findUserByEmail(email);
+    } else {
+      users = await this.adminsService.findUserByEmail(email);
     }
 
     if (users.length) {
@@ -53,8 +57,10 @@ export class AuthService {
     let user;
     if (entity === 'user') {
       user = await this.usersService.create(email, username, hash);
-    } else {
+    } else if (entity === 'artistManager') {
       user = await this.artistManagersService.create(email, username, hash);
+    } else {
+      user = await this.adminsService.create(email, username, hash);
     }
 
     return user;
@@ -64,8 +70,10 @@ export class AuthService {
     let user;
     if (entity === 'user') {
       [user] = await this.usersService.findUserByEmail(email);
-    } else {
+    } else if (entity === 'artistManager') {
       [user] = await this.artistManagersService.findUserByEmail(email);
+    } else {
+      [user] = await this.adminsService.findUserByEmail(email);
     }
 
     if (!user) {

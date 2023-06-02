@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Admin } from '../admins/admin.entity';
 
 @Entity()
 export class ArtistManger {
@@ -16,4 +18,10 @@ export class ArtistManger {
 
   @Column('text', { array: true, default: [] })
   artists: string[];
+
+  @Column()
+  verified: boolean;
+
+  @ManyToOne(() => Admin, (admin) => admin.artistManagersVerified)
+  verifiedBy: Admin;
 }
