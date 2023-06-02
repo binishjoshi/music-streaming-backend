@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 
 import { AppModule } from './../src/app.module';
 import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
+import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -37,6 +38,11 @@ describe('Auth (e2e)', () => {
     //   `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE;`,
     // );
     // dataSource.dropDatabase();
+    await dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(ArtistManagerRequest)
+      .execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
 
     // await dataSource.query(`truncate ${tableNames} restart;`);
@@ -110,6 +116,25 @@ describe('Auth (e2e)', () => {
       .get('/whoami')
       .set('Cookie', cookie)
       .expect(404);
+  });
+
+  it('requests for verification', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', cookie)
+      .field('letter', 'pls accept')
+      .attach(
+        'documents',
+        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
+      )
+      .expect(201);
   });
 
   // it('deactivates user', async () => {

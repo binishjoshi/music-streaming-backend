@@ -14,7 +14,9 @@ export class ArtistManagerRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => ArtistManger, (artistManager) => artistManager.id)
+  @OneToOne(() => ArtistManger, (artistManager) => artistManager.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   requestedBy: ArtistManger;
 
