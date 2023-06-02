@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { ArtistManger } from './artist-manager.entity';
+import { Admin } from '../admins/admin.entity';
 
 @Injectable()
 export class ArtistManagersService {
@@ -38,5 +39,13 @@ export class ArtistManagersService {
 
   delete(user: ArtistManger) {
     this.repo.remove(user);
+  }
+
+  async verify(id: string, admin: Admin) {
+    const artistManager = await this.repo.findOne({ where: { id: id } });
+    artistManager.verified = true;
+    artistManager.verifiedBy = admin;
+
+    this.repo.save(artistManager);
   }
 }

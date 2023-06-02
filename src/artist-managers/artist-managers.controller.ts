@@ -3,9 +3,12 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  InternalServerErrorException,
   MaxFileSizeValidator,
   NotFoundException,
+  Param,
   ParseFilePipe,
+  Patch,
   Post,
   Session,
   UploadedFile,
@@ -13,6 +16,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { QueryFailedError } from 'typeorm';
 
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -80,6 +84,30 @@ export class ArtistManagersController {
     return this.artistManagersRequestService.fetchAll();
   }
 
+  @Patch('requests/verify/:id')
+  @UseGuards(AuthGuard)
+  async verify(@Param('id') id: string, @CurrentAdmin() admin: Admin) {
+    if (!admin) {
+      throw new ForbiddenException();
+    }
+
+    let request;
+    try {
+      request = await this.artistManagersRequestService.findById(id);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        throw new NotFoundException();
+      }
+      throw new InternalServerErrorException();
+    }
+
+    if (!request) {
+      throw new NotFoundException();
+    }
+
+    this.artistManagersRequestService.verify(request, admin);
+  }
+
   @Post('request-for-verification')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('documents'))
@@ -98,7 +126,7 @@ export class ArtistManagersController {
       throw new ForbiddenException();
     }
 
-    this.artistManagersRequestService.create(
+    return this.artistManagersRequestService.create(
       body.letter,
       documents,
       artistManager,

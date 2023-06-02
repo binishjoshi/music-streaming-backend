@@ -137,6 +137,33 @@ describe('Auth (e2e)', () => {
       .expect(201);
   });
 
+  it('fails verifies artist manager request', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const cookie = res.get('Set-Cookie');
+
+    const { body } = await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', cookie)
+      .field('letter', 'pls accept')
+      .attach(
+        'documents',
+        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
+      )
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .patch(`/artist-managers/requests/verify/${body.id}`)
+      .set('Cookie', cookie)
+      .expect(403);
+  });
+
   // it('deactivates user', async () => {
   //   const res = await request(app.getHttpServer())
   //     .post(SIGNUP_ROUTE)

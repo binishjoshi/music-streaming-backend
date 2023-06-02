@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Admin } from '../admins/admin.entity';
 
@@ -22,6 +28,7 @@ export class ArtistManger {
   @Column({ default: false })
   verified: boolean;
 
-  @ManyToOne(() => Admin, (admin) => admin.artistManagersVerified)
+  @ManyToOne(() => Admin, { nullable: true, eager: true, onDelete: 'CASCADE' })
+  @JoinColumn()
   verifiedBy: Admin;
 }

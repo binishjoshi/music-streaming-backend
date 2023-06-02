@@ -16,6 +16,7 @@ export class ArtistManagerRequest {
 
   @OneToOne(() => ArtistManger, (artistManager) => artistManager.id, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   @JoinColumn()
   requestedBy: ArtistManger;
@@ -29,6 +30,6 @@ export class ArtistManagerRequest {
   @Column({ default: false })
   approved: boolean;
 
-  @ManyToOne(() => Admin, (admin) => admin.id)
+  @ManyToOne(() => Admin, (admin) => admin.id, { onDelete: 'CASCADE' })
   approvedBy: Admin;
 }
