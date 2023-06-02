@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   MaxFileSizeValidator,
+  NotFoundException,
   ParseFilePipe,
   Patch,
   Post,
@@ -37,6 +38,9 @@ export class UsersController {
   @Get('/whoami')
   @UseGuards(AuthGuard)
   whoAmI(@CurrentUser() user: User) {
+    if (!user) {
+      throw new NotFoundException();
+    }
     return user;
   }
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
   Session,
   UseGuards,
@@ -50,6 +51,9 @@ export class ArtistManagersController {
   @Get('whoami')
   @UseGuards(AuthGuard)
   whoAmI(@CurrentArtistManager() artistManager: ArtistManger) {
+    if (!artistManager) {
+      throw new NotFoundException();
+    }
     return artistManager;
   }
 }
