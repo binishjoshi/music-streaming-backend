@@ -1,8 +1,18 @@
-import { Body, Controller, Post, Session } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
 
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { SigninDto } from '../users/dtos/signin.dto';
+import { AuthGuard } from '../guards/auth.guard';
+import { CurrentArtistManager } from './decorators/current-artist-manager.decorator';
+import { ArtistManger } from './artist-manager.entity';
 
 @Controller('artist-managers')
 export class ArtistManagersController {
@@ -35,5 +45,11 @@ export class ArtistManagersController {
   @Post('signout')
   signout(@Session() session: any) {
     session.userId = null;
+  }
+
+  @Get('whoami')
+  @UseGuards(AuthGuard)
+  whoAmI(@CurrentArtistManager() artistManager: ArtistManger) {
+    return artistManager;
   }
 }

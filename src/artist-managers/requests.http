@@ -19,3 +19,6 @@ Content-Type: application/json
 
 ### Signout
 POST http://localhost:1337/artist-managers/signout
+
+### Who am I
+GET http://localhost:1337/artist-managers/whoami
