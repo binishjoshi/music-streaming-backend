@@ -15,6 +15,14 @@ import { ArtistManger } from './artist-managers/artist-manager.entity';
 import { AdminsModule } from './admins/admins.module';
 import { Admin } from './admins/admin.entity';
 import { ArtistManagerRequest } from './artist-managers/artist-manager-request.entity';
+import { ArtistsModule } from './artists/artists.module';
+import { AlbumsModule } from './albums/albums.module';
+import { SongsModule } from './songs/songs.module';
+import { Album } from './albums/album.entity';
+import { Artist } from './artists/artist.entity';
+import { Song } from './songs/song.entity';
+import { GenresModule } from './genres/genres.module';
+import { Genre } from './genres/genre.entity';
 
 @Module({
   imports: [
@@ -34,7 +42,16 @@ import { ArtistManagerRequest } from './artist-managers/artist-manager-request.e
           password: config.get<string>('POSTGRES_PASSWORD'),
           database: config.get<string>('POSTGRES_DB'),
           synchronize: true,
-          entities: [User, ArtistManger, Admin, ArtistManagerRequest],
+          entities: [
+            User,
+            ArtistManger,
+            Admin,
+            ArtistManagerRequest,
+            Album,
+            Artist,
+            Song,
+            Genre,
+          ],
         };
       },
     }),
@@ -42,6 +59,10 @@ import { ArtistManagerRequest } from './artist-managers/artist-manager-request.e
     AuthModule,
     ArtistManagersModule,
     AdminsModule,
+    ArtistsModule,
+    AlbumsModule,
+    SongsModule,
+    GenresModule,
   ],
   controllers: [AppController],
   providers: [

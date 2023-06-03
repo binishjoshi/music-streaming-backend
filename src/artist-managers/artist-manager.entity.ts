@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Admin } from '../admins/admin.entity';
+import { Artist } from '../artists/artist.entity';
 
 @Entity()
 export class ArtistManger {
@@ -22,8 +24,8 @@ export class ArtistManger {
   @Column()
   password: string;
 
-  @Column('text', { array: true, default: [] })
-  artists: string[];
+  @OneToMany(() => Artist, (artist) => artist.managedBy)
+  artists: Artist[];
 
   @Column({ default: false })
   verified: boolean;

@@ -7,6 +7,7 @@ import { AppModule } from './../src/app.module';
 import { Admin } from '../src/admins/admin.entity';
 import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
 import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
+import { Artist } from '../src/artists/artist.entity';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -33,6 +34,7 @@ describe('Auth (e2e)', () => {
     const dataSource = app.get(DataSource);
     await dataSource.createQueryBuilder().delete().from(Admin).execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
+    await dataSource.createQueryBuilder().delete().from(Artist).execute();
     await dataSource
       .createQueryBuilder()
       .delete()
@@ -44,6 +46,7 @@ describe('Auth (e2e)', () => {
     const dataSource = app.get(DataSource);
     await dataSource.createQueryBuilder().delete().from(Admin).execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
+    await dataSource.createQueryBuilder().delete().from(Artist).execute();
     await dataSource
       .createQueryBuilder()
       .delete()
@@ -190,6 +193,37 @@ describe('Auth (e2e)', () => {
       .patch(`/artist-managers/requests/verify/sum_random_id_thats_not_uuid`)
       .set('Cookie', cookie)
       .expect(404);
+  });
+
+  it('fails to fetch artists as artist manager', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .get('/artist-managers/artists')
+      .set('Cookie', cookie)
+      .expect(403);
+  });
+
+  it('fails to create artists as artist manager', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(403);
   });
 
   // it('deactivates user', async () => {

@@ -48,4 +48,14 @@ export class ArtistManagersService {
 
     this.repo.save(artistManager);
   }
+
+  async fetchArtists(artistManager: ArtistManger) {
+    const artistManagerWithArtists = await this.repo.findOne({
+      where: { id: artistManager.id },
+      relations: {
+        artists: true,
+      },
+    });
+    return artistManagerWithArtists.artists;
+  }
 }

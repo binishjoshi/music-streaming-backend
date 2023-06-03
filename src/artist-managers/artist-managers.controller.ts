@@ -29,12 +29,14 @@ import { CurrentAdmin } from '../admins/decorators/current-admin.decorator';
 import { Admin } from '../admins/admin.entity';
 import { ImageValidationPipe } from '../pipes/image-validation.pipe';
 import { FileType } from '../types/file.type';
+import { ArtistManagersService } from './artist-managers.service';
 
 @Controller('artist-managers')
 export class ArtistManagersController {
   constructor(
     private authService: AuthService,
     private artistManagersRequestService: ArtistManagerRequestsService,
+    private artistManagersService: ArtistManagersService,
   ) {}
 
   @Post('/signup')
@@ -131,5 +133,14 @@ export class ArtistManagersController {
       documents,
       artistManager,
     );
+  }
+
+  @Get('artists')
+  @UseGuards(AuthGuard)
+  fetchManagingArtists(@CurrentArtistManager() artistManager: ArtistManger) {
+    if (!artistManager) {
+      throw new ForbiddenException();
+    }
+    return this.artistManagersService.fetchArtists(artistManager);
   }
 }

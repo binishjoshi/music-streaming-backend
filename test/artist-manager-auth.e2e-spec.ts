@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { AppModule } from './../src/app.module';
 import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
 import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
+import { Artist } from '../src/artists/artist.entity';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -25,27 +26,26 @@ describe('Auth (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-  });
 
-  afterEach(async () => {
     const dataSource = app.get(DataSource);
-    // const entityManager = app.get(EntityManager);
-    // const tableNames = entityManager.connection.entityMetadatas
-    //   .map((entity) => entity.tableName)
-    //   .join(', ');
-    // console.log(tableNames);
-    // await entityManager.query(
-    //   `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE;`,
-    // );
-    // dataSource.dropDatabase();
     await dataSource
       .createQueryBuilder()
       .delete()
       .from(ArtistManagerRequest)
       .execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
+    await dataSource.createQueryBuilder().delete().from(Artist).execute();
+  });
 
-    // await dataSource.query(`truncate ${tableNames} restart;`);
+  afterAll(async () => {
+    const dataSource = app.get(DataSource);
+    await dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(ArtistManagerRequest)
+      .execute();
+    await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
+    await dataSource.createQueryBuilder().delete().from(Artist).execute();
   });
 
   it('handles signup request', () => {
@@ -161,6 +161,67 @@ describe('Auth (e2e)', () => {
     await request(app.getHttpServer())
       .patch(`/artist-managers/requests/verify/${body.id}`)
       .set('Cookie', cookie)
+      .expect(403);
+  });
+
+  it('creates an aritst', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(201);
+  });
+
+  it('fetches artists that it manages', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Doom')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/ad7b0e7c963596127c8421700d37efb8.png')
+      .expect(201);
+
+    const { body } = await request(app.getHttpServer())
+      .get('/artist-managers/artists')
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(body.length).toBe(2);
+  });
+
+  it('failes fetching artists it manages', async () => {
+    await request(app.getHttpServer())
+      .get('/artist-managers/artists')
       .expect(403);
   });
 
