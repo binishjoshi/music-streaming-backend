@@ -3,7 +3,9 @@ import {
   Controller,
   ForbiddenException,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
+  Patch,
   Post,
   UploadedFile,
   UseGuards,
@@ -19,6 +21,7 @@ import { ImageValidationPipe } from '../pipes/image-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 import { ArtistsService } from './artists.service';
+import { UpdateArtistDto } from './dtos/update-artist.dto';
 
 @Controller('artists')
 export class ArtistsController {
@@ -43,11 +46,25 @@ export class ArtistsController {
       throw new ForbiddenException();
     }
 
-    this.artistsService.create(
+    return this.artistsService.create(
       body.name,
       body.description,
       picture,
       artistManager,
     );
+  }
+
+  @Patch('/:id')
+  @UseGuards(AuthGuard)
+  updateArtist(
+    @CurrentArtistManager() artistManager: ArtistManger,
+    @Param('id') id,
+    @Body() body: UpdateArtistDto,
+  ) {
+    if (!artistManager) {
+      throw new ForbiddenException();
+    }
+
+    return this.artistsService.update(id, body, artistManager);
   }
 }

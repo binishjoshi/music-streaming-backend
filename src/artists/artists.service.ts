@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Artist } from './artist.entity';
@@ -26,5 +30,31 @@ export class ArtistsService {
     });
 
     return this.repo.save(artist);
+  }
+
+  async update(
+    id: string,
+    attributes: Partial<Artist>,
+    artistManager: ArtistManger,
+  ) {
+    const artist = await this.repo.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        managedBy: true,
+      },
+    });
+
+    if (!artist) {
+      throw new NotFoundException();
+    }
+
+    if (artist.managedBy.id !== artistManager.id) {
+      throw new ForbiddenException();
+    }
+
+    Object.assign(artist, attributes);
+    this.repo.save(artist);
   }
 }
