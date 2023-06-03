@@ -11,19 +11,22 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CreateArtistDto } from './dtos/create-artist.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentArtistManager } from '../artist-managers/decorators/current-artist-manager.decorator';
 import { ArtistManger } from '../artist-managers/artist-manager.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../pipes/image-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 import { ArtistsService } from './artists.service';
 import { UpdateArtistDto } from './dtos/update-artist.dto';
+import { Serialize } from '../interceptor/serialize.interceptor';
+import { ArtistDto } from './dtos/artist.dto';
 
 @Controller('artists')
+@Serialize(ArtistDto)
 export class ArtistsController {
   constructor(private artistsService: ArtistsService) {}
 

@@ -14,8 +14,11 @@ import { SigninDto } from '../users/dtos/signin.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentAdmin } from './decorators/current-admin.decorator';
 import { Admin } from './admin.entity';
+import { Serialize } from '../interceptor/serialize.interceptor';
+import { AdminDto } from './dtos/admin.dto';
 
 @Controller('admins')
+@Serialize(AdminDto)
 export class AdminsController {
   constructor(private authService: AuthService) {}
 

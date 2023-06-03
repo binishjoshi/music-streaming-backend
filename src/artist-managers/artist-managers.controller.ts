@@ -30,8 +30,11 @@ import { Admin } from '../admins/admin.entity';
 import { ImageValidationPipe } from '../pipes/image-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ArtistManagersService } from './artist-managers.service';
+import { Serialize } from '../interceptor/serialize.interceptor';
+import { ArtistManagerDto } from './dtos/artist-manager.dto';
 
 @Controller('artist-managers')
+@Serialize(ArtistManagerDto)
 export class ArtistManagersController {
   constructor(
     private authService: AuthService,
