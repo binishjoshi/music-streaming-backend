@@ -7,8 +7,9 @@ import { AppModule } from './../src/app.module';
 import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
 import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
 import { Artist } from '../src/artists/artist.entity';
+import { Admin } from '../src/admins/admin.entity';
 
-describe('Auth (e2e)', () => {
+describe('Artist Manager (e2e)', () => {
   let app: INestApplication;
 
   const EMAIL = 'test@pm.me';
@@ -18,6 +19,13 @@ describe('Auth (e2e)', () => {
   const SIGNIN_ROUTE = '/artist-managers/signin';
   const SIGNOUT_ROUTE = '/artist-managers/signout';
   const WHOAMI_ROUTE = '/artist-managers/whoami';
+  const ADMIN_SIGNUP_ROUTE = '/admins/signup';
+
+  function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -35,6 +43,7 @@ describe('Auth (e2e)', () => {
       .execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
     await dataSource.createQueryBuilder().delete().from(Artist).execute();
+    await dataSource.createQueryBuilder().delete().from(Admin).execute();
   });
 
   afterAll(async () => {
@@ -46,6 +55,7 @@ describe('Auth (e2e)', () => {
       .execute();
     await dataSource.createQueryBuilder().delete().from(ArtistManger).execute();
     await dataSource.createQueryBuilder().delete().from(Artist).execute();
+    await dataSource.createQueryBuilder().delete().from(Admin).execute();
   });
 
   it('handles signup request', () => {
@@ -175,6 +185,29 @@ describe('Auth (e2e)', () => {
       .expect(201);
     const cookie = res.get('Set-Cookie');
 
+    const requestedResponse = await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', cookie)
+      .field('letter', 'pls accept')
+      .attach(
+        'documents',
+        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
+      )
+      .expect(201);
+
+    const adminSignupResponse = await request(app.getHttpServer())
+      .post(ADMIN_SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+    const adminCookie = adminSignupResponse.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
+      .set('Cookie', adminCookie)
+      .expect(200);
+
+    await sleep(50);
+
     await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
@@ -194,6 +227,28 @@ describe('Auth (e2e)', () => {
       })
       .expect(201);
     const cookie = res.get('Set-Cookie');
+
+    const requestedResponse = await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', cookie)
+      .field('letter', 'pls accept')
+      .attach(
+        'documents',
+        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
+      )
+      .expect(201);
+
+    const adminSignupResponse = await request(app.getHttpServer())
+      .post(ADMIN_SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+    const adminCookie = adminSignupResponse.get('Set-Cookie');
+    await request(app.getHttpServer())
+      .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
+      .set('Cookie', adminCookie)
+      .expect(200);
+
+    await sleep(50);
 
     await request(app.getHttpServer())
       .post('/artists/create')
@@ -219,7 +274,27 @@ describe('Auth (e2e)', () => {
     expect(body.length).toBe(2);
   });
 
-  it('failes fetching artists it manages', async () => {
+  it('fails to create artist without verification', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const cookie = res.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(403);
+  });
+
+  it('fails fetching artists it manages', async () => {
     await request(app.getHttpServer())
       .get('/artist-managers/artists')
       .expect(403);

@@ -21,6 +21,10 @@ export class ArtistsService {
     picture: FileType,
     artistManager: ArtistManger,
   ) {
+    if (!artistManager.verified) {
+      throw new ForbiddenException('You have to be verified.');
+    }
+
     const filePath = saveFile(picture);
     const artist = this.repo.create({
       name: name,
