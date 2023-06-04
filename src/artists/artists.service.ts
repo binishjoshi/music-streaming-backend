@@ -61,4 +61,31 @@ export class ArtistsService {
     Object.assign(artist, attributes);
     this.repo.save(artist);
   }
+
+  async changePicture(
+    file: FileType,
+    artistManager: ArtistManger,
+    artistId: string,
+  ) {
+    const artist = await this.repo.findOne({
+      where: {
+        id: artistId,
+      },
+      relations: {
+        managedBy: true,
+      },
+    });
+
+    if (!artist) {
+      throw new NotFoundException();
+    }
+
+    if (artist.managedBy.id !== artistManager.id) {
+      throw new ForbiddenException();
+    }
+
+    const newPicturePath = saveFile(file);
+    artist.picture = newPicturePath;
+    return this.repo.save(artist);
+  }
 }

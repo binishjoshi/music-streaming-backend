@@ -70,4 +70,26 @@ export class ArtistsController {
 
     return this.artistsService.update(id, body, artistManager);
   }
+
+  @Post('/change-picture/:id')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('picture'))
+  changePicture(
+    @CurrentArtistManager() artistManager: ArtistManger,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })],
+      }),
+      new ImageValidationPipe(),
+      new ImageDownscalePipe(),
+    )
+    picture: FileType,
+    @Param('id') id: string,
+  ) {
+    if (!artistManager) {
+      throw new ForbiddenException();
+    }
+
+    return this.artistsService.changePicture(picture, artistManager, id);
+  }
 }

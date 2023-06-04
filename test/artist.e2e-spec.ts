@@ -103,4 +103,59 @@ describe('Artist (e2e)', () => {
       .send({ description: 'Updated.' })
       .expect(200);
   });
+
+  it('changes profile picture', async () => {
+    const res = await request(app.getHttpServer())
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const cookie = res.get('Set-Cookie');
+
+    const requestedResponse = await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', cookie)
+      .field('letter', 'pls accept')
+      .attach(
+        'documents',
+        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
+      )
+      .expect(201);
+
+    const adminSignupResponse = await request(app.getHttpServer())
+      .post(ADMIN_SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+    const adminCookie = adminSignupResponse.get('Set-Cookie');
+    await request(app.getHttpServer())
+      .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
+      .set('Cookie', adminCookie)
+      .expect(200);
+
+    function sleep(ms) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    }
+
+    // for some reason transactions
+    await sleep(50);
+
+    const { body } = await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', cookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .post(`/artists/change-picture/${body.id}`)
+      .set('Cookie', cookie)
+      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .expect(201);
+  });
 });
