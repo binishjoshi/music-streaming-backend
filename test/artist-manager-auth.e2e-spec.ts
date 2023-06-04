@@ -8,6 +8,7 @@ import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
 import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
 import { Artist } from '../src/artists/artist.entity';
 import { Admin } from '../src/admins/admin.entity';
+import { deleteFile } from './lib/deleteFile';
 
 describe('Artist Manager (e2e)', () => {
   let app: INestApplication;
@@ -20,6 +21,8 @@ describe('Artist Manager (e2e)', () => {
   const SIGNOUT_ROUTE = '/artist-managers/signout';
   const WHOAMI_ROUTE = '/artist-managers/whoami';
   const ADMIN_SIGNUP_ROUTE = '/admins/signup';
+
+  const TEST_IMAGE = 'test/images/Adele_for_Vogue_in_2021.png';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -134,10 +137,7 @@ describe('Artist Manager (e2e)', () => {
       .post('/artist-managers/request-for-verification')
       .set('Cookie', cookie)
       .field('letter', 'pls accept')
-      .attach(
-        'documents',
-        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
-      )
+      .attach('documents', TEST_IMAGE)
       .expect(201);
   });
 
@@ -156,16 +156,15 @@ describe('Artist Manager (e2e)', () => {
       .post('/artist-managers/request-for-verification')
       .set('Cookie', cookie)
       .field('letter', 'pls accept')
-      .attach(
-        'documents',
-        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
-      )
+      .attach('documents', TEST_IMAGE)
       .expect(201);
 
     await request(app.getHttpServer())
       .patch(`/artist-managers/requests/verify/${body.id}`)
       .set('Cookie', cookie)
       .expect(403);
+
+    body.documents.forEach((document) => deleteFile(document));
   });
 
   it('creates an aritst', async () => {
@@ -183,10 +182,7 @@ describe('Artist Manager (e2e)', () => {
       .post('/artist-managers/request-for-verification')
       .set('Cookie', cookie)
       .field('letter', 'pls accept')
-      .attach(
-        'documents',
-        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
-      )
+      .attach('documents', TEST_IMAGE)
       .expect(201);
 
     const adminSignupResponse = await request(app.getHttpServer())
@@ -200,13 +196,15 @@ describe('Artist Manager (e2e)', () => {
       .set('Cookie', adminCookie)
       .expect(200);
 
-    await request(app.getHttpServer())
+    const { body } = await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
       .field('name', 'Adele')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .attach('picture', TEST_IMAGE)
       .expect(201);
+
+    deleteFile(body.picture);
   });
 
   it('fetches artists that it manages', async () => {
@@ -224,10 +222,7 @@ describe('Artist Manager (e2e)', () => {
       .post('/artist-managers/request-for-verification')
       .set('Cookie', cookie)
       .field('letter', 'pls accept')
-      .attach(
-        'documents',
-        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
-      )
+      .attach('documents', TEST_IMAGE)
       .expect(201);
 
     const adminSignupResponse = await request(app.getHttpServer())
@@ -240,20 +235,20 @@ describe('Artist Manager (e2e)', () => {
       .set('Cookie', adminCookie)
       .expect(200);
 
-    await request(app.getHttpServer())
+    const createRequest = await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
       .field('name', 'Adele')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .attach('picture', TEST_IMAGE)
       .expect(201);
 
-    await request(app.getHttpServer())
+    const createRequest2 = await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
       .field('name', 'Doom')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/ad7b0e7c963596127c8421700d37efb8.png')
+      .attach('picture', TEST_IMAGE)
       .expect(201);
 
     const { body } = await request(app.getHttpServer())
@@ -262,6 +257,12 @@ describe('Artist Manager (e2e)', () => {
       .expect(200);
 
     expect(body.length).toBe(2);
+
+    requestedResponse.body.documents.forEach((document) =>
+      deleteFile(document),
+    );
+    deleteFile(createRequest.body.picture);
+    deleteFile(createRequest2.body.picture);
   });
 
   it('fails to create artist without verification', async () => {
@@ -280,7 +281,7 @@ describe('Artist Manager (e2e)', () => {
       .set('Cookie', cookie)
       .field('name', 'Adele')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .attach('picture', TEST_IMAGE)
       .expect(403);
   });
 

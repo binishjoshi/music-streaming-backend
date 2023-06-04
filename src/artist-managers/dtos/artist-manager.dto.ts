@@ -12,4 +12,7 @@ export class ArtistManagerDto {
 
   @Expose()
   verified: boolean;
+
+  @Expose()
+  documents: string;
 }

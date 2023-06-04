@@ -8,6 +8,7 @@ import { Admin } from '../src/admins/admin.entity';
 import { ArtistManger } from '../src/artist-managers/artist-manager.entity';
 import { ArtistManagerRequest } from '../src/artist-managers/artist-manager-request.entity';
 import { Artist } from '../src/artists/artist.entity';
+import { deleteFile } from './lib/deleteFile';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -23,6 +24,8 @@ describe('Auth (e2e)', () => {
   const ARTIST_MANAGER_EMAIL = 'manager@pm.me';
   const ARTIST_MANAGER_USERNAME = 'manager1234';
   const ARTIST_MANAGER_PASSWORD = 'test123456';
+
+  const TEST_IMAGE = 'test/images/Adele_for_Vogue_in_2021.png';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -159,10 +162,7 @@ describe('Auth (e2e)', () => {
       .post('/artist-managers/request-for-verification')
       .set('Cookie', aritstManagerCookie)
       .field('letter', 'pls accept')
-      .attach(
-        'documents',
-        'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg',
-      )
+      .attach('documents', TEST_IMAGE)
       .expect(201);
 
     const res = await request(app.getHttpServer())
@@ -174,6 +174,8 @@ describe('Auth (e2e)', () => {
       .patch(`/artist-managers/requests/verify/${body.id}`)
       .set('Cookie', cookie)
       .expect(200);
+
+    body.documents.forEach((document) => deleteFile(document));
   });
 
   it('throws for wrong artist manager request id', async () => {
@@ -222,7 +224,7 @@ describe('Auth (e2e)', () => {
       .set('Cookie', cookie)
       .field('name', 'Adele')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .attach('picture', TEST_IMAGE)
       .expect(403);
   });
 

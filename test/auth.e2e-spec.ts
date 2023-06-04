@@ -16,6 +16,7 @@ describe('Auth (e2e)', () => {
   const SIGNUP_ROUTE = '/users/signup';
   const SIGNIN_ROUTE = '/users/signin';
   const SIGNOUT_ROUTE = '/users/signout';
+  const TEST_IMAGE = 'test/images/Adele_for_Vogue_in_2021.png';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -133,7 +134,7 @@ describe('Auth (e2e)', () => {
       .set('Cookie', cookie)
       .field('name', 'Adele')
       .field('description', 'Good singer.')
-      .attach('picture', 'uploads/images/49f08cc2ae6facc3cef894d9d751e4d2.jpg')
+      .attach('picture', TEST_IMAGE)
       .expect(403);
   });
 
