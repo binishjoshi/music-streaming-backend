@@ -23,7 +23,7 @@ import { Serialize } from '../interceptor/serialize.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../guards/auth.guard';
-import { ImageValidationPipe } from '../pipes/image-validation.pipe';
+import { FileTypeValidationPipe } from '../pipes/file-type-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 
@@ -98,7 +98,7 @@ export class UsersController {
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 8 * 1024 * 1024 })],
       }),
-      new ImageValidationPipe(),
+      new FileTypeValidationPipe('image'),
       new ImageDownscalePipe(),
     )
     file: FileType,

@@ -27,7 +27,7 @@ import { ArtistManger } from './artist-manager.entity';
 import { ArtistManagerRequestsService } from './artist-manager-requests.service';
 import { CurrentAdmin } from '../admins/decorators/current-admin.decorator';
 import { Admin } from '../admins/admin.entity';
-import { ImageValidationPipe } from '../pipes/image-validation.pipe';
+import { FileTypeValidationPipe } from '../pipes/file-type-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ArtistManagersService } from './artist-managers.service';
 import { Serialize } from '../interceptor/serialize.interceptor';
@@ -121,7 +121,7 @@ export class ArtistManagersController {
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })],
       }),
-      new ImageValidationPipe(),
+      new FileTypeValidationPipe('image'),
     )
     documents: FileType,
     @CurrentArtistManager() artistManager: ArtistManger,

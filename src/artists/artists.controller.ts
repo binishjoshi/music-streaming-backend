@@ -17,7 +17,7 @@ import { CreateArtistDto } from './dtos/create-artist.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentArtistManager } from '../artist-managers/decorators/current-artist-manager.decorator';
 import { ArtistManger } from '../artist-managers/artist-manager.entity';
-import { ImageValidationPipe } from '../pipes/image-validation.pipe';
+import { FileTypeValidationPipe } from '../pipes/file-type-validation.pipe';
 import { FileType } from '../types/file.type';
 import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 import { ArtistsService } from './artists.service';
@@ -39,7 +39,7 @@ export class ArtistsController {
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })],
       }),
-      new ImageValidationPipe(),
+      new FileTypeValidationPipe('image'),
       new ImageDownscalePipe(),
     )
     picture: FileType,
@@ -80,7 +80,7 @@ export class ArtistsController {
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })],
       }),
-      new ImageValidationPipe(),
+      new FileTypeValidationPipe('image'),
       new ImageDownscalePipe(),
     )
     picture: FileType,
