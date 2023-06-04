@@ -80,15 +80,6 @@ describe('Artist (e2e)', () => {
       .set('Cookie', adminCookie)
       .expect(200);
 
-    function sleep(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    // for some reason transactions
-    await sleep(50);
-
     const { body } = await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
@@ -134,15 +125,6 @@ describe('Artist (e2e)', () => {
       .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
       .set('Cookie', adminCookie)
       .expect(200);
-
-    function sleep(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    // for some reason transactions
-    await sleep(50);
 
     const { body } = await request(app.getHttpServer())
       .post('/artists/create')

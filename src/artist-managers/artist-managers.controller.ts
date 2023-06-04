@@ -110,7 +110,7 @@ export class ArtistManagersController {
       throw new NotFoundException();
     }
 
-    this.artistManagersRequestService.verify(request, admin);
+    await this.artistManagersRequestService.verify(request, admin);
   }
 
   @Post('request-for-verification')

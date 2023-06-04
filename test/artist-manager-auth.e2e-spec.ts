@@ -21,12 +21,6 @@ describe('Artist Manager (e2e)', () => {
   const WHOAMI_ROUTE = '/artist-managers/whoami';
   const ADMIN_SIGNUP_ROUTE = '/admins/signup';
 
-  function sleep(ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-  }
-
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -206,8 +200,6 @@ describe('Artist Manager (e2e)', () => {
       .set('Cookie', adminCookie)
       .expect(200);
 
-    await sleep(50);
-
     await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
@@ -247,8 +239,6 @@ describe('Artist Manager (e2e)', () => {
       .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
       .set('Cookie', adminCookie)
       .expect(200);
-
-    await sleep(50);
 
     await request(app.getHttpServer())
       .post('/artists/create')
