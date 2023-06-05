@@ -107,7 +107,7 @@ describe('Auth (e2e)', () => {
       .expect(404);
   });
 
-  it('fails to fetch artists as artist manager', async () => {
+  it('fails to fetch artists', async () => {
     const res = await request(app.getHttpServer())
       .post(SIGNUP_ROUTE)
       .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
@@ -118,10 +118,10 @@ describe('Auth (e2e)', () => {
     await request(app.getHttpServer())
       .get('/artist-managers/artists')
       .set('Cookie', cookie)
-      .expect(403);
+      .expect(401);
   });
 
-  it('fails to create artists as artist manager', async () => {
+  it('fails to create artists', async () => {
     const res = await request(app.getHttpServer())
       .post(SIGNUP_ROUTE)
       .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
@@ -135,7 +135,7 @@ describe('Auth (e2e)', () => {
       .field('name', 'Adele')
       .field('description', 'Good singer.')
       .attach('picture', TEST_IMAGE)
-      .expect(403);
+      .expect(401);
   });
 
   it('deactivates user', async () => {
