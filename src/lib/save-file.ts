@@ -11,7 +11,7 @@ import { FileType } from '../types/file.type';
  */
 export function saveFile(
   file: FileType,
-  path: 'uploads/images' | 'uploads/audio/lossless' | 'uploads/audio/lossy',
+  path: 'uploads/images/' | 'uploads/audio/lossless/' | 'uploads/audio/lossy/',
 ) {
   const md5Hash = createHash('md5');
   md5Hash.update(file.buffer);

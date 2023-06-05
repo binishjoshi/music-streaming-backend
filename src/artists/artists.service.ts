@@ -25,7 +25,7 @@ export class ArtistsService {
       throw new ForbiddenException('You have to be verified.');
     }
 
-    const filePath = saveFile(picture, 'uploads/images');
+    const filePath = saveFile(picture, 'uploads/images/');
     const artist = this.repo.create({
       name: name,
       description: description,
@@ -84,7 +84,7 @@ export class ArtistsService {
       throw new ForbiddenException();
     }
 
-    const newPicturePath = saveFile(file, 'uploads/images');
+    const newPicturePath = saveFile(file, 'uploads/images/');
     artist.picture = newPicturePath;
     return this.repo.save(artist);
   }
