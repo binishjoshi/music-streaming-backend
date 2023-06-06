@@ -144,7 +144,8 @@ describe('Artist (e2e)', () => {
     requestedResponse.body.documents.forEach((document) =>
       deleteFile(document),
     );
-    deleteFile(body.picture);
+
+    // only delete the last TEST_IMAGE that was downscaled
     deleteFile(imageChangeRequest.body.picture);
   });
 });

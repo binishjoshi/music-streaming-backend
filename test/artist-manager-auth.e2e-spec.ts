@@ -243,7 +243,7 @@ describe('Artist Manager (e2e)', () => {
       .attach('picture', TEST_IMAGE)
       .expect(201);
 
-    const createRequest2 = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/artists/create')
       .set('Cookie', cookie)
       .field('name', 'Doom')
@@ -262,7 +262,6 @@ describe('Artist Manager (e2e)', () => {
       deleteFile(document),
     );
     deleteFile(createRequest.body.picture);
-    deleteFile(createRequest2.body.picture);
   });
 
   it('fails to create artist without verification', async () => {

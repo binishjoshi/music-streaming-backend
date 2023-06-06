@@ -12,7 +12,7 @@ import { deleteFile } from './lib/deleteFile';
 import { Song } from '../src/songs/song.entity';
 import { Album } from '../src/albums/album.entity';
 
-describe('Auth (e2e)', () => {
+describe('Album (e2e)', () => {
   let app: INestApplication;
 
   const EMAIL = 'test@pm.me';
@@ -133,12 +133,10 @@ describe('Auth (e2e)', () => {
       deleteFile(song.pathLossy);
     });
 
-    const artistManagerRequest: ArtistManagerRequest = requestedResponse.body;
-    artistManagerRequest.documents.forEach((file) => {
-      deleteFile(file);
-    });
-
-    deleteFile(artistCreationResponse.body.picture);
+    // const artistManagerRequest: ArtistManagerRequest = requestedResponse.body;
+    // artistManagerRequest.documents.forEach((file) => {
+    //   deleteFile(file);
+    // });
   });
 
   it("throws 403 when creating album from an artist that you don't manage", async () => {
