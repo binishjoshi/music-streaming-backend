@@ -18,7 +18,7 @@ export class Album {
   @Column()
   name: string;
 
-  @Column()
+  @Column('float', { default: 0 })
   duration: number;
 
   @Column()
@@ -27,10 +27,15 @@ export class Album {
   @Column()
   coverArt: string;
 
-  @OneToMany(() => Song, (song) => song.id)
+  @Column('date')
+  releaseDate: Date;
+
+  @OneToMany(() => Song, (song) => song.album, { onDelete: 'CASCADE' })
   songs: Song[];
 
-  @ManyToOne(() => Artist, (artist) => artist.id)
+  @ManyToOne(() => Artist, (artist) => artist.albums, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   artist: Artist;
 }

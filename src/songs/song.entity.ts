@@ -20,7 +20,7 @@ export class Song {
   @Column()
   title: string;
 
-  @Column()
+  @Column('float')
   duration: number;
 
   @ManyToOne(() => Artist, (artist) => artist.id, {
@@ -30,7 +30,10 @@ export class Song {
   @JoinColumn()
   artist: Artist;
 
-  @OneToMany(() => Album, (album) => album.id)
+  @ManyToOne(() => Album, (album) => album.songs, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   album: Album;
 
@@ -42,10 +45,7 @@ export class Song {
   @JoinTable()
   genres: Genre[];
 
-  @Column('date')
-  releaseDate: Date;
-
-  @Column('int')
+  @Column('int', { default: 0 })
   playCount: number;
 
   @Column()
@@ -54,9 +54,9 @@ export class Song {
   @Column()
   pathLossless: string;
 
-  @Column()
+  @Column({ nullable: true })
   hash: string;
 
-  @Column()
+  @Column({ nullable: true })
   rawHash: string;
 }

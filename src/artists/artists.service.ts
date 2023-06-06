@@ -15,6 +15,14 @@ import { ArtistManger } from '../artist-managers/artist-manager.entity';
 export class ArtistsService {
   constructor(@InjectRepository(Artist) private repo: Repository<Artist>) {}
 
+  findOneById(id: string) {
+    return this.repo.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
+
   create(
     name: string,
     description: string,
