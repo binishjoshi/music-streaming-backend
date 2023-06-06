@@ -35,6 +35,17 @@ export class AlbumsService {
     private genresService: GenresService,
   ) {}
 
+  getAlbumWithSongs(id: string) {
+    return this.repo.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        songs: true,
+      },
+    });
+  }
+
   async create(
     artistManager: ArtistManger,
     files: FileType[],
@@ -139,6 +150,8 @@ export class AlbumsService {
       await queryRunner.manager.save(savedAlbum);
 
       await queryRunner.commitTransaction();
+
+      return savedAlbum;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();

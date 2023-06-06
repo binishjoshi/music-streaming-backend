@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UploadedFiles,
   UseGuards,
@@ -28,6 +30,11 @@ export class AlbumsController {
     @UploadedFiles(new AlbumCreationValidationPipe()) files: FileType[],
     @Body() body: CreateAlbumDto,
   ) {
-    await this.albumsService.create(artistManager, files, body);
+    return this.albumsService.create(artistManager, files, body);
+  }
+
+  @Get('/:id')
+  getAlbumWithSongs(@Param('id') id) {
+    return this.albumsService.getAlbumWithSongs(id);
   }
 }

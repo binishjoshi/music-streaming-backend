@@ -30,7 +30,9 @@ export class Album {
   @Column('date')
   releaseDate: Date;
 
-  @OneToMany(() => Song, (song) => song.album, { onDelete: 'CASCADE' })
+  @OneToMany(() => Song, (song) => song.album, {
+    onDelete: 'CASCADE',
+  })
   songs: Song[];
 
   @ManyToOne(() => Artist, (artist) => artist.albums, {

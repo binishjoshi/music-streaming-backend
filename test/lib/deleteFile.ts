@@ -3,5 +3,9 @@ import { unlinkSync } from 'fs';
 export const deleteFile = (file) => {
   try {
     unlinkSync(file);
-  } catch (error) {}
+  } catch (error) {
+    if (error) {
+      console.log(error);
+    }
+  }
 };
