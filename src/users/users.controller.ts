@@ -86,8 +86,8 @@ export class UsersController {
 
   @Patch('/change-preference')
   @UseGuards(AuthGuard)
-  changePrefernce(@CurrentUser() user: User) {
-    this.usersService.changePreference(user);
+  async changePrefernce(@CurrentUser() user: User) {
+    await this.usersService.changePreference(user);
   }
 
   @Post('/change-profile')

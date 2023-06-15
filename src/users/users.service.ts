@@ -41,9 +41,9 @@ export class UsersService {
     this.repo.remove(user);
   }
 
-  changePreference(user: User) {
+  async changePreference(user: User) {
     user.preference = user.preference === 'flac' ? 'opus' : 'flac';
-    this.repo.save(user);
+    await this.repo.save(user);
   }
 
   savePicture(file: FileType, user: User) {
