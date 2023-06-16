@@ -1,6 +1,10 @@
 import { exec } from 'child_process';
 import path from 'path';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { parseFile } from 'music-metadata';
@@ -109,11 +113,16 @@ export class AlbumsService {
         );
         const baseMd5 = path.basename(losslessPath, '.flac');
         const lossyPath = 'uploads/audio/lossy/' + baseMd5 + '.opus';
-        exec(`opusenc --bitrate 256 ${losslessPath} ${lossyPath}`, (error) => {
-          if (error) {
-            console.log(error);
-          }
-        });
+        exec(
+          `ffmpeg -i ${losslessPath} -c:a libopus -b:a 256k ${lossyPath}`,
+          (error) => {
+            if (error) {
+              console.log(error);
+
+              throw new InternalServerErrorException();
+            }
+          },
+        );
         songsInformationArray.push({
           title: songDetails.songs[i].title,
           genres: songDetails.songs[i].genres,
