@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -39,15 +40,23 @@ export class AlbumsService {
     private genresService: GenresService,
   ) {}
 
-  getAlbumWithSongs(id: string) {
-    return this.repo.findOne({
+  async getAlbumWithSongs(id: string) {
+    // ideally, songs shouldn't have filepaths
+    const album = await this.repo.findOne({
       where: {
         id: id,
       },
       relations: {
         songs: true,
+        artist: true,
       },
     });
+
+    if (!album) {
+      throw new NotFoundException();
+    }
+
+    return album;
   }
 
   async create(
@@ -113,7 +122,7 @@ export class AlbumsService {
         );
         const baseMd5 = path.basename(losslessPath, '.flac');
         const lossyPath = 'uploads/audio/lossy/' + baseMd5 + '.opus';
-        exec(
+        await exec(
           `ffmpeg -i ${losslessPath} -c:a libopus -b:a 256k ${lossyPath}`,
           (error) => {
             if (error) {
@@ -128,6 +137,7 @@ export class AlbumsService {
           genres: songDetails.songs[i].genres,
           pathLossy: lossyPath,
           pathLossless: losslessPath,
+          artist: artist,
         });
 
         // get genres

@@ -23,8 +23,7 @@ export class Song {
   @Column('float')
   duration: number;
 
-  @ManyToOne(() => Artist, (artist) => artist.id, {
-    eager: true,
+  @ManyToOne(() => Artist, (artist) => artist.songs, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
