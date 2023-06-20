@@ -236,11 +236,11 @@ describe('Song (e2e)', () => {
       .set('Range', 'bytes=0')
       .expect(206);
 
-    // const songs: Song[] = getAlbumWithSongsResponse.body.songs;
-    // songs.forEach((song) => {
-    //   deleteFile(song.pathLossless);
-    //   deleteFile(song.pathLossy);
-    // });
+    const songs: Song[] = getAlbumWithSongsResponse.body.songs;
+    songs.forEach((song) => {
+      deleteFile(song.pathLossless);
+      deleteFile(song.pathLossy);
+    });
 
     // const artistManagerRequest: ArtistManagerRequest = requestedResponse.body;
     // artistManagerRequest.documents.forEach((file) => {
