@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
+import { basename } from 'path';
 
 import { AppModule } from './../src/app.module';
 import { Admin } from '../src/admins/admin.entity';
@@ -153,6 +154,93 @@ describe('Song (e2e)', () => {
       deleteFile(song.pathLossless);
       deleteFile(song.pathLossy);
     });
+
+    // const artistManagerRequest: ArtistManagerRequest = requestedResponse.body;
+    // artistManagerRequest.documents.forEach((file) => {
+    //   deleteFile(file);
+    // });
+  });
+
+  it('streams song', async () => {
+    const res = await request(app.getHttpServer())
+      .post(ARTIST_MANAGER_SIGNUP_ROUTE)
+      .send({
+        email: EMAIL,
+        username: USERNAME,
+        password: PASSWORD,
+      })
+      .expect(201);
+    const artistManagerCookie = res.get('Set-Cookie');
+
+    const requestedResponse = await request(app.getHttpServer())
+      .post('/artist-managers/request-for-verification')
+      .set('Cookie', artistManagerCookie)
+      .field('letter', 'pls accept')
+      .attach('documents', TEST_IMAGE)
+      .expect(201);
+
+    const adminSignupResponse = await request(app.getHttpServer())
+      .post(ADMIN_SIGNUP_ROUTE)
+      .send({ email: EMAIL, username: USERNAME, password: PASSWORD })
+      .expect(201);
+    const adminCookie = adminSignupResponse.get('Set-Cookie');
+
+    await request(app.getHttpServer())
+      .patch(`/artist-managers/requests/verify/${requestedResponse.body.id}`)
+      .set('Cookie', adminCookie)
+      .expect(200);
+
+    const artistCreationResponse = await request(app.getHttpServer())
+      .post('/artists/create')
+      .set('Cookie', artistManagerCookie)
+      .field('name', 'Adele')
+      .field('description', 'Good singer.')
+      .attach('picture', TEST_IMAGE)
+      .expect(201);
+
+    const songDetailsString = `{
+      "songs": [{
+        "title": "Sa Karnali",
+        "genres": ["blues", "pop"]
+      }]
+    }`;
+    const albumCreationResponse = await request(app.getHttpServer())
+      .post('/albums/create')
+      .set('Cookie', artistManagerCookie)
+      .field('name', ALBUM_NAME)
+      .field('type', ALBUM_TYPE)
+      .field('artist', artistCreationResponse.body.id)
+      .field('releaseDate', '2021-09-24')
+      .field('songDetails', songDetailsString)
+      .attach('songs', TEST_AUDIO)
+      .attach('cover', TEST_IMAGE)
+      .expect(201);
+
+    const createdAlbum: Album = albumCreationResponse.body;
+
+    expect(createdAlbum.name).toBe(ALBUM_NAME);
+    expect(createdAlbum.type).toBe(ALBUM_TYPE);
+
+    deleteFile(createdAlbum.coverArt);
+
+    const getAlbumWithSongsResponse = await request(app.getHttpServer()).get(
+      `/albums/${albumCreationResponse.body.id}`,
+    );
+
+    const songFileName: string = basename(
+      getAlbumWithSongsResponse.body.songs[0].pathLossy,
+    );
+
+    await request(app.getHttpServer())
+      .get(`/songs/stream/${songFileName}`)
+      .set('Range', 'bytes=0')
+      .expect(206);
+
+    // const songs: Song[] = getAlbumWithSongsResponse.body.songs;
+    // songs.forEach((song) => {
+    //   deleteFile(song.pathLossless);
+    //   deleteFile(song.pathLossy);
+    // });
 
     // const artistManagerRequest: ArtistManagerRequest = requestedResponse.body;
     // artistManagerRequest.documents.forEach((file) => {
