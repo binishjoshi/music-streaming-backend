@@ -122,7 +122,7 @@ export class AlbumsService {
         );
         const baseMd5 = path.basename(losslessPath, '.flac');
         const lossyPath = 'uploads/audio/lossy/' + baseMd5 + '.opus';
-        await exec(
+        exec(
           `ffmpeg -i ${losslessPath} -c:a libopus -b:a 256k ${lossyPath}`,
           (error) => {
             if (error) {
@@ -174,6 +174,7 @@ export class AlbumsService {
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
     } finally {
       await queryRunner.release();
     }
