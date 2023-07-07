@@ -23,6 +23,13 @@ export class ArtistsService {
     });
   }
 
+  find() {
+    return this.repo.find({
+      skip: 0,
+      take: 10,
+    });
+  }
+
   create(
     name: string,
     description: string,

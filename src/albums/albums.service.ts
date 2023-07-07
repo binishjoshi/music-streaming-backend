@@ -40,6 +40,13 @@ export class AlbumsService {
     private genresService: GenresService,
   ) {}
 
+  get() {
+    return this.repo.find({
+      skip: 0,
+      take: 10,
+    });
+  }
+
   async getAlbumWithSongs(id: string) {
     // ideally, songs shouldn't have filepaths
     const album = await this.repo.findOne({

@@ -22,6 +22,11 @@ import { CreateAlbumDto } from './dtos/create-album.dto';
 export class AlbumsController {
   constructor(private albumsService: AlbumsService) {}
 
+  @Get()
+  fetchAlbums() {
+    return this.albumsService.get();
+  }
+
   @Post('create')
   @UseGuards(AuthGuard)
   @UseInterceptors(AnyFilesInterceptor())

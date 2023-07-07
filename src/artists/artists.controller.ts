@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -29,6 +30,11 @@ import { ArtistDto } from './dtos/artist.dto';
 @Serialize(ArtistDto)
 export class ArtistsController {
   constructor(private artistsService: ArtistsService) {}
+
+  @Get()
+  fetch() {
+    return this.artistsService.find();
+  }
 
   @Post('/create')
   @UseGuards(AuthGuard)
