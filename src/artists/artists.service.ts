@@ -20,6 +20,9 @@ export class ArtistsService {
       where: {
         id: id,
       },
+      relations: {
+        albums: true,
+      },
     });
   }
 

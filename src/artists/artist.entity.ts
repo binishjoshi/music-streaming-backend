@@ -30,7 +30,7 @@ export class Artist {
   @JoinColumn()
   managedBy: ArtistManger;
 
-  @OneToMany(() => Album, (album) => album.id)
+  @OneToMany(() => Album, (album) => album.artist)
   albums: Album[];
 
   @OneToMany(() => Song, (song) => song.artist)

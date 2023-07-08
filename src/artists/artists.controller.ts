@@ -23,17 +23,22 @@ import { FileType } from '../types/file.type';
 import { ImageDownscalePipe } from '../pipes/image-downscale.pipe';
 import { ArtistsService } from './artists.service';
 import { UpdateArtistDto } from './dtos/update-artist.dto';
-import { Serialize } from '../interceptor/serialize.interceptor';
-import { ArtistDto } from './dtos/artist.dto';
+// import { Serialize } from '../interceptor/serialize.interceptor';
+// import { ArtistDto } from './dtos/artist.dto';
 
 @Controller('artists')
-@Serialize(ArtistDto)
+// @Serialize(ArtistDto)
 export class ArtistsController {
   constructor(private artistsService: ArtistsService) {}
 
   @Get()
   fetch() {
     return this.artistsService.find();
+  }
+
+  @Get(':id')
+  getArtistById(@Param('id') id: string) {
+    return this.artistsService.findOneById(id);
   }
 
   @Post('/create')
