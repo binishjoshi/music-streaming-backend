@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -18,6 +19,13 @@ import { createReadStream, statSync } from 'fs';
 @Controller('songs')
 export class SongsController {
   constructor(private songsSerivce: SongsService) {}
+
+  @Get('search')
+  search(@Query('query') query: string) {
+    if (query === '') return [];
+
+    return this.songsSerivce.search(query);
+  }
 
   @Get('/url/:id')
   @UseGuards(AuthGuard)
