@@ -44,6 +44,9 @@ export class AlbumsService {
     return this.repo.find({
       skip: 0,
       take: 10,
+      relations: {
+        artist: true,
+      },
     });
   }
 
