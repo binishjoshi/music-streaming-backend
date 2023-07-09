@@ -6,11 +6,13 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Artist } from '../artists/artist.entity';
 import { Genre } from '../genres/genre.entity';
 import { Album } from '../albums/album.entity';
+import { Mrs } from '../mrs/mrs.entity';
 
 @Entity()
 export class Song {
@@ -58,4 +60,8 @@ export class Song {
 
   @Column({ nullable: true })
   rawHash: string;
+
+  @OneToOne(() => Mrs, (mrs) => mrs.songId)
+  @JoinColumn()
+  mrsIndex: Mrs;
 }

@@ -23,6 +23,8 @@ import { Artist } from './artists/artist.entity';
 import { Song } from './songs/song.entity';
 import { GenresModule } from './genres/genres.module';
 import { Genre } from './genres/genre.entity';
+import { MrsModule } from './mrs/mrs.module';
+import { Mrs } from './mrs/mrs.entity';
 
 @Module({
   imports: [
@@ -51,6 +53,7 @@ import { Genre } from './genres/genre.entity';
             Artist,
             Song,
             Genre,
+            Mrs,
           ],
         };
       },
@@ -63,6 +66,7 @@ import { Genre } from './genres/genre.entity';
     AlbumsModule,
     SongsModule,
     GenresModule,
+    MrsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,5 +1,7 @@
+import { promisify } from 'util';
 import { exec } from 'child_process';
 import path from 'path';
+import { unlinkSync } from 'fs';
 import {
   ForbiddenException,
   Injectable,
@@ -12,6 +14,7 @@ import { parseFile } from 'music-metadata';
 
 import { Album } from './album.entity';
 import { ArtistManger } from '../artist-managers/artist-manager.entity';
+import { Mrs } from '../mrs/mrs.entity';
 import { FileType } from '../types/file.type';
 import { CreateAlbumDto } from './dtos/create-album.dto';
 import { saveFile } from '../lib/save-file';
@@ -29,11 +32,19 @@ interface SongDetailsType {
   songs: SongDetailType[];
 }
 
+interface MaxAudioEmbedding {
+  status: string;
+  embedding: Array<Array<number>>;
+}
+
+const promisifiedExec = promisify(exec);
+
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album) private repo: Repository<Album>,
     @InjectRepository(Song) private songRepo: Repository<Song>,
+    @InjectRepository(Mrs) private mrsRepo: Repository<Mrs>,
     private dataSource: DataSource,
     private artistManagersService: ArtistManagersService,
     private artistsService: ArtistsService,
@@ -112,8 +123,10 @@ export class AlbumsService {
       const savedSongs: Song[] = [];
 
       // find artist
+      console.log('Finding artist...');
       const artist = await this.artistsService.findOneById(body.artist);
 
+      console.log('Creating album...');
       // create album
       const album = this.repo.create({
         name: body.name,
@@ -132,15 +145,9 @@ export class AlbumsService {
         );
         const baseMd5 = path.basename(losslessPath, '.flac');
         const lossyPath = 'uploads/audio/lossy/' + baseMd5 + '.opus';
-        exec(
-          `ffmpeg -i ${losslessPath} -c:a libopus -b:a 256k ${lossyPath}`,
-          (error) => {
-            if (error) {
-              console.log(error);
-
-              throw new InternalServerErrorException();
-            }
-          },
+        console.log(`Transcoding ${songDetails.songs[i].title} into opus...`);
+        await promisifiedExec(
+          `ffmpeg -y -i ${losslessPath} -c:a libopus -b:a 256k ${lossyPath}`,
         );
         songsInformationArray.push({
           title: songDetails.songs[i].title,
@@ -166,7 +173,35 @@ export class AlbumsService {
           duration: metadata.format.duration,
           album: savedAlbum,
         });
+
+        console.log('Transcoding to wav...');
+        const wavPath = 'uploads/audio/lossless/' + baseMd5 + '.wav';
+        await promisifiedExec(`ffmpeg -y -i ${losslessPath} ${wavPath}`);
+
+        console.log('Calculating MAX Audio Embedding...');
+        exec(
+          `curl -X POST "host.docker.internal:5001/model/predict" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "audio=@${wavPath};type=audio/x-wav"`,
+          (error, stdout) => {
+            if (error) {
+              console.log(error);
+            }
+
+            const maxResponse: MaxAudioEmbedding = JSON.parse(stdout);
+            const maxEmbedding = maxResponse.embedding.splice(0, 10).flat();
+
+            console.log('Deleting transcoded wav...');
+            unlinkSync(wavPath);
+
+            const mrsIndex = this.mrsRepo.create({
+              songId: song,
+              maxEmbedding: maxEmbedding,
+            });
+
+            this.mrsRepo.save(mrsIndex);
+          },
+        );
         await queryRunner.manager.save(song);
+
         savedSongs.push(song);
       }
 

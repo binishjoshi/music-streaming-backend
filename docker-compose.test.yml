@@ -17,6 +17,8 @@ services:
     depends_on:
       - test-sangeet-postgres
     command: yarn start:dev
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
   test-sangeet-postgres:
     container_name: test-sangeet-database
