@@ -11,6 +11,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { parseFile } from 'music-metadata';
+import Annoy from 'annoy';
 
 import { Album } from './album.entity';
 import { ArtistManger } from '../artist-managers/artist-manager.entity';
@@ -181,7 +182,7 @@ export class AlbumsService {
         console.log('Calculating MAX Audio Embedding...');
         exec(
           `curl -X POST "host.docker.internal:5001/model/predict" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "audio=@${wavPath};type=audio/x-wav"`,
-          (error, stdout) => {
+          async (error, stdout) => {
             if (error) {
               console.log(error);
             }
@@ -197,7 +198,7 @@ export class AlbumsService {
               maxEmbedding: maxEmbedding,
             });
 
-            this.mrsRepo.save(mrsIndex);
+            await this.mrsRepo.save(mrsIndex);
           },
         );
         await queryRunner.manager.save(song);
@@ -214,6 +215,18 @@ export class AlbumsService {
       await queryRunner.manager.save(savedAlbum);
 
       await queryRunner.commitTransaction();
+
+      // build annoy index
+
+      const annoyIndex = new Annoy(1280, 'angular');
+
+      this.mrsRepo.find().then((indices) => {
+        indices.map((index) => {
+          annoyIndex.addItem(index.id, index.maxEmbedding);
+        });
+        annoyIndex.build();
+        annoyIndex.save('src/mrs/mrs.ann');
+      });
 
       return savedAlbum;
     } catch (error) {

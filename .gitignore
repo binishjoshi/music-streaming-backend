@@ -7,6 +7,9 @@
 # fs
 /uploads
 
+# Annoy index
+*mrs.ann*
+
 # Logs
 logs
 *.log
